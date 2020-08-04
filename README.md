@@ -1,1 +1,3 @@
-A basic web app that determines your words per minute.
+# Typing Speed Test
+
+## A basic typing speed test that determines your WPM after typing 20 words.
