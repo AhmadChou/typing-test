@@ -1,3 +1,1 @@
-# Typing Test
-
-A simple typing web app that determines your WPM.
+A basic web app that determines your words per minute.
