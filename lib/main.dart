@@ -4,10 +4,9 @@ import 'package:english_words/english_words.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-Random random = new Random();
 bool timerStart = false;
 Stopwatch stopwatch = new Stopwatch();
-RawKeyboardListener rawKeyboardListener;
+Random random = new Random();
 
 void main() {
   runApp(MyApp());
@@ -52,11 +51,17 @@ class _TypingBuildState extends State<TypingBuild> {
   double wpm = 0;
   int cIndex = 0;
   bool darkTheme = true;
-  Color bodyColor = Colors.black87;
-  Color appBarColor = Colors.black45;
+  bool lightTheme = false;
+  bool oceanTheme = false;
+  Color bodyColor = Colors.grey[900];
+  Color appBarColor = Colors.grey[800];
   Color textColor = Colors.white;
   Color borderColor = Colors.white;
-  Color textCompleteColor = Colors.white;
+  Color iconColor = Colors.white;
+  int wpmColorR = 255;
+  int wpmColorG = 255;
+  int wpmColorB = 255;
+  int containerAlpha = 50;
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +88,7 @@ class _TypingBuildState extends State<TypingBuild> {
               width: 700,
               padding: EdgeInsets.all(20.0),
               decoration: ShapeDecoration(
-                color: Color.fromARGB(50, 0, 0, 0),
+                color: Color.fromARGB(containerAlpha, 0, 0, 0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.0),
                   side: BorderSide(
@@ -96,8 +101,7 @@ class _TypingBuildState extends State<TypingBuild> {
                 textAlign: TextAlign.center,
                 text: TextSpan(
                   text: modifiedList,
-                  style: GoogleFonts.dosis(
-                      color: textCompleteColor, fontSize: 22.0),
+                  style: GoogleFonts.dosis(color: textColor, fontSize: 22.0),
                 ),
               ),
             ),
@@ -113,7 +117,7 @@ class _TypingBuildState extends State<TypingBuild> {
                   width: 500.0,
                   padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
                   decoration: ShapeDecoration(
-                    color: Color.fromARGB(50, 0, 0, 0),
+                    color: Color.fromARGB(containerAlpha, 0, 0, 0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20.0),
                       side: BorderSide(
@@ -134,7 +138,7 @@ class _TypingBuildState extends State<TypingBuild> {
                         new FilteringTextInputFormatter.deny(' '),
                       ],
                       style: TextStyle(
-                        color: Colors.white,
+                        color: textColor,
                         fontSize: 18.0,
                       ),
                       onChanged: (value) {
@@ -170,22 +174,25 @@ class _TypingBuildState extends State<TypingBuild> {
                     ),
                   ),
                 ),
+                SizedBox(
+                  width: 10.0,
+                ),
                 Container(
                   height: 70.0,
                   width: 70.0,
                   decoration: ShapeDecoration(
-                    color: Color.fromARGB(50, 0, 0, 0),
+                    color: Color.fromARGB(containerAlpha, 0, 0, 0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20.0),
                       side: BorderSide(
-                        color: Colors.blue,
+                        color: Colors.blue[300],
                         width: 4.0,
                       ),
                     ),
                   ),
                   child: IconButton(
                     icon: Icon(Icons.redo),
-                    color: Colors.white,
+                    color: iconColor,
                     onPressed: () {
                       setState(() {
                         resetApp();
@@ -202,14 +209,14 @@ class _TypingBuildState extends State<TypingBuild> {
               text: TextSpan(
                 text: 'Current Word: ',
                 style: GoogleFonts.dosis(
-                  color: Colors.white,
+                  color: textColor,
                   fontSize: 20.0,
                 ),
                 children: <TextSpan>[
                   TextSpan(
                     text: word,
                     style: GoogleFonts.dosis(
-                      color: Colors.blue,
+                      color: Colors.blue[300],
                       fontSize: 20.0,
                     ),
                   ),
@@ -223,7 +230,7 @@ class _TypingBuildState extends State<TypingBuild> {
               child: Text(
                 'Successfully typed words: $amountTyped/20',
                 style: GoogleFonts.dosis(
-                  color: Colors.white,
+                  color: textColor,
                   fontSize: 20.0,
                 ),
               ),
@@ -233,7 +240,8 @@ class _TypingBuildState extends State<TypingBuild> {
               child: Text(
                 'WPM: ' + rounding(wpm).toString(),
                 style: GoogleFonts.dosis(
-                  color: Color.fromARGB(wpmAlpha, 255, 255, 255),
+                  color:
+                      Color.fromARGB(wpmAlpha, wpmColorR, wpmColorG, wpmColorB),
                   fontSize: 20.0,
                 ),
               ),
@@ -244,8 +252,9 @@ class _TypingBuildState extends State<TypingBuild> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.lightbulb_outline),
         backgroundColor: Color.fromARGB(0, 0, 0, 0),
+        foregroundColor: iconColor,
         elevation: 0.0,
-        hoverElevation: 3.0,
+        hoverElevation: 1.0,
         onPressed: () {
           changeTheme();
         },
@@ -323,10 +332,15 @@ class _TypingBuildState extends State<TypingBuild> {
       word = wordList[wordIndex];
       myController.clear();
       cIndex = 0;
-      tfColor = Colors.white;
       stopwatch.stop();
       stopwatch.reset();
       amountTyped = 0;
+
+      if (lightTheme) {
+        tfColor = Colors.grey[600];
+      } else {
+        tfColor = Colors.white;
+      }
     });
   }
 
@@ -361,17 +375,54 @@ class _TypingBuildState extends State<TypingBuild> {
   void changeTheme() {
     if (darkTheme) {
       setState(() {
-        bodyColor = Colors.grey[400];
-        appBarColor = Colors.grey;
-        textColor = Colors.black87;
-        darkTheme = false;
-      });
-    } else {
-      setState(() {
-        bodyColor = Colors.black87;
-        appBarColor = Colors.black45;
+        bodyColor = Colors.blueGrey[900];
+        appBarColor = Colors.blueGrey[800];
         textColor = Colors.white;
+        borderColor = Colors.white;
+        wpmColorR = 255;
+        wpmColorG = 255;
+        wpmColorB = 255;
+        containerAlpha = 50;
+        iconColor = Colors.white;
+        if (tfColor == Colors.grey[600]) {
+          tfColor = Colors.white;
+        }
+        darkTheme = false;
+        oceanTheme = true;
+      });
+    } else if (lightTheme) {
+      setState(() {
+        bodyColor = Colors.grey[900];
+        appBarColor = Colors.grey[800];
+        textColor = Colors.white;
+        borderColor = Colors.white;
+        wpmColorR = 255;
+        wpmColorG = 255;
+        wpmColorB = 255;
+        containerAlpha = 50;
+        iconColor = Colors.white;
+        if (tfColor == Colors.grey[600]) {
+          tfColor = Colors.white;
+        }
+        lightTheme = false;
         darkTheme = true;
+      });
+    } else if (oceanTheme) {
+      setState(() {
+        bodyColor = Colors.white;
+        appBarColor = Colors.grey[300];
+        textColor = Colors.black;
+        borderColor = Colors.grey[600];
+        wpmColorR = 0;
+        wpmColorG = 0;
+        wpmColorB = 0;
+        containerAlpha = 25;
+        iconColor = Colors.grey[700];
+        if (tfColor == Colors.white) {
+          tfColor = Colors.grey[600];
+        }
+        oceanTheme = false;
+        lightTheme = true;
       });
     }
   }
