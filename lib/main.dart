@@ -313,12 +313,13 @@ class _TypingBuildState extends State<TypingBuild> {
               cIndex -= 1;
             });
           }
-        }
 
-        if (Text(myController.text).data == word) {
-          setState(() {
-            tfColor = Colors.green;
-          });
+          if (Text(myController.text).data.substring(0, cIndex) ==
+              word.substring(0, cIndex)) {
+            setState(() {
+              tfColor = Colors.green;
+            });
+          }
         }
       }
 
