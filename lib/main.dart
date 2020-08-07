@@ -42,7 +42,7 @@ class _TypingBuildState extends State<TypingBuild> {
   static String modifiedList = modifedWordList(wordList);
   static String word = wordList[wordIndex];
   static int wordIndex = 0;
-  Key key = UniqueKey();
+  final Key key = UniqueKey();
   Color tfColor = Colors.white;
   int amountTyped = 0;
   double secondsTyped;
@@ -50,6 +50,8 @@ class _TypingBuildState extends State<TypingBuild> {
   int wpmAlpha = 0;
   double wpm = 0;
   int cIndex = 0;
+
+  //Theme related
   bool darkTheme = true;
   bool lightTheme = false;
   bool oceanTheme = false;
@@ -142,6 +144,7 @@ class _TypingBuildState extends State<TypingBuild> {
                         fontSize: 18.0,
                       ),
                       onChanged: (value) {
+                        //starting timer only after text field has been edited
                         if (amountTyped < 20) {
                           setState(() {
                             timerStart = true;
@@ -149,6 +152,7 @@ class _TypingBuildState extends State<TypingBuild> {
                           });
                         }
 
+                        //keeping track of text field input using cIndex to determine correctly typed characters
                         if (Text(myController.text).data.length <=
                             word.length) {
                           if (Text(myController.text)
@@ -166,6 +170,7 @@ class _TypingBuildState extends State<TypingBuild> {
                             });
                           }
                         } else {
+                          //setting text field border to red if user input exceeds current word length
                           setState(() {
                             tfColor = Colors.red;
                           });
@@ -262,6 +267,7 @@ class _TypingBuildState extends State<TypingBuild> {
     );
   }
 
+  //function for converting milliseconds to seconds (makes the wpm calculations simpler)
   static double mToS(int mill) {
     double seconds = mill.toDouble();
     return seconds / 1000;
@@ -272,6 +278,7 @@ class _TypingBuildState extends State<TypingBuild> {
       if (event.logicalKey == LogicalKeyboardKey.space) {
         if (event.runtimeType.toString() == 'RawKeyDownEvent') {
           if (Text(myController.text).data == word) {
+            //switching to next word once space is pressed only if the correct word is typed in the text field
             setState(() {
               if (wordIndex < 19) {
                 wordIndex += 1;
@@ -283,10 +290,12 @@ class _TypingBuildState extends State<TypingBuild> {
             });
           }
 
+          //stopping timer once 20 word have been successfully typed
           if (amountTyped >= 20) {
             setState(() {
               timerStart = false;
               stopwatch.stop();
+              //calculating and dispalying WPM, calculations are: (total characters/5) * (60/seconds), -19 is to account for an extra space added after each word in the word bank
               wpm = ((modifiedList.length - 19) / 5) *
                   (60.0 / mToS(stopwatch.elapsedMilliseconds));
               wpmAlpha = 255;
@@ -295,6 +304,7 @@ class _TypingBuildState extends State<TypingBuild> {
         }
       }
 
+      //accounting for user backspacing a correctly typed character to keep the live feedback accurate
       if (event.logicalKey == LogicalKeyboardKey.backspace) {
         if (event.runtimeType.toString() == 'RawKeyDownEvent') {
           if (cIndex >= Text(myController.text).data.length &&
@@ -312,17 +322,16 @@ class _TypingBuildState extends State<TypingBuild> {
         }
       }
 
+      //alowing user to reset wordbank, timer and, textfield by pressing the escape key
       if (event.logicalKey == LogicalKeyboardKey.escape) {
         if (event.runtimeType.toString() == 'RawKeyDownEvent') {
           resetApp();
-          if (wordList.length != 20) {
-            print('NOT 20!!!!!');
-          }
         }
       }
     });
   }
 
+  //function for resetting app, called when pressing the escape key or redo button
   void resetApp() {
     setState(() {
       new RandomWords();
@@ -336,6 +345,7 @@ class _TypingBuildState extends State<TypingBuild> {
       stopwatch.reset();
       amountTyped = 0;
 
+      //resetting base text field border color in case it is green or red once user resets
       if (lightTheme) {
         tfColor = Colors.grey[600];
       } else {
@@ -353,16 +363,17 @@ class _TypingBuildState extends State<TypingBuild> {
     for (int i = 0; i < 20; i++) {
       RandomWords randomWords = new RandomWords();
       String tempWord = randomWords.getRandomWord();
+      //ensuring the same word does not show up twice in word list
       if (!words.contains(tempWord)) {
         words.add(tempWord);
       } else {
         i -= 1;
       }
     }
-
     return words;
   }
 
+  //removing unnessecary .toString() stuff and adding an extra space for visual clarity
   static String modifedWordList(List<String> text) {
     String result = text.toString();
     result = result.replaceAll('[', '');
